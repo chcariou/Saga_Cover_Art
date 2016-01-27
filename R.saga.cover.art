@@ -1,0 +1,87 @@
+
+
+# R program
+# Saga Cover Art
+# By Christophe Cariou, April 2015
+# Last update: January 2016
+# http://www.chcariou.fr
+
+
+# Libraries + my functions
+
+	library(extrafont)
+
+	source("/Users/ChCariou/Desktop/R/colors.kmeans.R") # Extract color palette
+	#https://github.com/chcariou/R.functions.on.colors/blob/master/colors.kmeans.R
+	source("/Users/ChCariou/Desktop/R/colors.attributes.R") # Add hue to color palette
+	#https://github.com/chcariou/R.functions.on.colors/blob/master/colors.attributes.R
+	source("/Users/ChCariou/Desktop/R/text.columns.R") # Text with selected width
+	# http://github.com/chcariou/R.functions.on.text/blob/master/text.columns.R 
+
+
+# Create image list, Extract color palette and add hue
+
+
+	for (i in 1:35) {
+		url <- paste("/Users/ChCariou/Desktop/R_Saga_CoverArt/cover_raster/cover_",i,".jpg",sep="")
+		if (i==1) { url.liste <- url } else { url.liste <- c(url.liste,url) }
+	}
+
+	palette00 <- colors.kmeans(url.liste,12)
+	palette <- colors.attributes(palette00, Chroma=FALSE, Hue=TRUE)
+	palette <- palette[order(palette$Alias, palette$Hue ,decreasing=FALSE),]
+
+
+# Datavisualisation : R CSS
+
+	# Fonts
+
+		font.title <- "Avenir Next Medium"
+		font.creators <- "Avenir Next Regular"
+		font.body <- "Times Italic"
+
+	# Colors
+
+		col.bg <- "#FEFEFE"
+		col.txt <- "#262D2D"
+
+
+	# Window, marge and plot size
+
+	dev.off()
+	quartz(width=29.7/2.6,height=21/2.6,bg="#FEFEFE")
+	par(mar=c(0,0,0,0),oma=c(1,1,1,1))
+	plot(0,0,xlim=c(0,1.5),ylim=c(0,36),type="n",xaxs="i",yaxs="i",axes=FALSE,xlab=NA,ylab=NA)
+
+
+# Datavisualisation
+
+	# Colors
+
+		for (i in 1:35) { 
+			covers <- subset(palette,Alias==i)
+			if (i<10) { issue <- paste("#0",i,sep="")} else { issue <- paste("#",i,sep="")}
+			text(0.5,i,issue,col=col.txt,cex=0.60,family=font.creators, pos=2)
+			s <- 0.5
+			for (j in 1:12) { 
+				e <- s+ covers$Size[j]
+				rect(s,i-0.4,e,i+0.4,col=rgb(covers$R[j], covers$G[j], covers$B[j]),border=NA)
+				s <- e
+			}	
+		}
+
+	#Texts
+
+		text(0,32.4, "Saga",cex=8,family=font.title,col=col.txt,pos=4,offset=0)
+		text(0,30, "ART BY FIONA STAPLES", cex=0.75, family=font.creators, col=col.txt, pos=4,offset=0)
+		text(0,29, "WRITTEN BY BRIAN K. VAUGHAN", cex=0.75, family=font.creators, col=col.txt, pos=4,offset=0)
+		text(0,28, "LETTERS+DESIGN BY FONOGRAPHIKS", cex=0.75, family=font.creators, col=col.txt, pos=4,offset=0)
+		text(0,1, "By Christophe Cariou with R , 2016.", cex=0.6, family=font.creators, col=col.txt, pos=4,offset=0)
+
+
+speech <- "8 Eisner Awards, 13 Harvey Awards and 1 Hugo Award in just three years. Saga is just amazing. And colorful covers are simply splendid. Here a visualisation of the color palette used by Fiona Staples."
+
+
+	
+		textR(0,18,speech, family=font.body, cex=0.7, col=col.txt, w=0.4)
+
